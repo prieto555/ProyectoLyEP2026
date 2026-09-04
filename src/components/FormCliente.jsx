@@ -98,11 +98,20 @@ const FormCliente = () => {
 
                 <Form.Group className="mb-3">
 
-                    <Form.Label>Nombre</Form.Label>
+                    <Form.Label htmlFor="cliente-nombre">Nombre</Form.Label>
 
                     <Form.Control
+                        id="cliente-nombre"
                         type="text"
+                        required
                         value={nombre}
+                        aria-required="true"
+                        aria-invalid={campoInvalido(nombre)}
+                        aria-describedby={
+                            campoInvalido(nombre)
+                                ? "error-formulario-cliente"
+                                : undefined
+                        }
                         onChange={(e) =>
                             setNombre(e.target.value)
                         }

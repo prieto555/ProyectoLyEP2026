@@ -94,7 +94,7 @@ const FormCliente = () => {
 
             <h3>Nuevo Cliente</h3>
 
-            <Form onSubmit={manejarSubmit}>
+            <Form noValidate onSubmit={manejarSubmit} aria-busy={loading}>
 
                 <Form.Group className="mb-3">
 

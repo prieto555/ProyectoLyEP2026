@@ -14,6 +14,9 @@ const FormCliente = () => {
     const [error, setError] = useState("");
     const [loading, setLoading] = useState(false);
 
+    const campoInvalido = (valor) =>
+        Boolean(error) && valor.trim() === "";
+
     const manejarSubmit = async (e) => {
 
         e.preventDefault();
@@ -109,11 +112,20 @@ const FormCliente = () => {
 
                 <Form.Group className="mb-3">
 
-                    <Form.Label>Email</Form.Label>
+                    <Form.Label htmlFor="cliente-email">Email</Form.Label>
 
                     <Form.Control
+                        id="cliente-email"
                         type="email"
+                        required
                         value={email}
+                        aria-required="true"
+                        aria-invalid={campoInvalido(email)}
+                        aria-describedby={
+                            campoInvalido(email)
+                                ? "error-formulario-cliente"
+                                : undefined
+                        }
                         onChange={(e) =>
                             setEmail(e.target.value)
                         }
@@ -123,11 +135,20 @@ const FormCliente = () => {
 
                 <Form.Group className="mb-3">
 
-                    <Form.Label>Teléfono</Form.Label>
+                    <Form.Label htmlFor="cliente-telefono">Teléfono</Form.Label>
 
                     <Form.Control
+                        id="cliente-telefono"
                         type="text"
+                        required
                         value={telefono}
+                        aria-required="true"
+                        aria-invalid={campoInvalido(telefono)}
+                        aria-describedby={
+                            campoInvalido(telefono)
+                                ? "error-formulario-cliente"
+                                : undefined
+                        }
                         onChange={(e) =>
                             setTelefono(e.target.value)
                         }
@@ -168,6 +189,8 @@ const FormCliente = () => {
             {
                 mensaje &&
                 <Alert
+                    role="status"
+                    aria-live="polite"
                     className="mt-3"
                     variant="success"
                 >
@@ -178,6 +201,9 @@ const FormCliente = () => {
             {
                 error &&
                 <Alert
+                    id="error-formulario-cliente"
+                    role="alert"
+                    aria-live="assertive"
                     className="mt-3"
                     variant="danger"
                 >

@@ -17,7 +17,14 @@ const DetalleCliente = () => {
       .then((data) => setCliente(data));
   }, [id]);
 
+  const puedeEliminar = sector?.trim() === "Gerencia";
+
   const eliminarCliente = async () => {
+    if (!puedeEliminar) {
+      setMensaje("No tiene permisos para eliminar clientes");
+      return;
+    }
+
     try {
       const respuesta = await fetch(
         `https://fakestoreapi.com/users/${id}`,
@@ -93,7 +100,7 @@ const DetalleCliente = () => {
         <strong>Contraseña:</strong> {cliente.password}
       </p>
 
-      {sector?.trim() === "Gerencia" && (
+      {puedeEliminar && (
         <button className='btn-eliminar'onClick={eliminarCliente}>
           Eliminar Cliente
         </button>

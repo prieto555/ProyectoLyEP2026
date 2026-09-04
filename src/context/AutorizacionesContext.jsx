@@ -22,12 +22,13 @@ useEffect(()=>{
   }
 
 },[admin])
+const sector = admin ? admin.sector : null
 const cerrarSesion=()=>{
   setAdmin(null)
 }
 return (
     <AutorizacionesContext.Provider
-      value={{ admin, setAdmin, cerrarSesion }}
+      value={{ admin, sector, setAdmin, cerrarSesion }}
     >
       {children}
     </AutorizacionesContext.Provider>

@@ -196,7 +196,12 @@ const FormCliente = () => {
 
                     {
                         loading
-                            ? <Spinner size="sm" />
+                            ? <>
+                                <Spinner size="sm" aria-hidden="true" />
+                                <span className="visually-hidden">
+                                    Guardando cliente...
+                                </span>
+                              </>
                             : "Guardar Cliente"
                     }
 

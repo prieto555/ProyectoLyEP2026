@@ -1,9 +1,11 @@
 import '../css/dashboard.css'
 import useAutorizaciones from '../hooks/useAutorizaciones'
+import AutorizacionesService from '../services/autorizacionesServices'
 import Login from './Login'
 
 const Dashboard = () => {
   const { admin } = useAutorizaciones()
+  const usuariosPorSector = AutorizacionesService.contarUsuariosPorSector()
 
   return (
     <div className="dashboard">
@@ -32,15 +34,12 @@ const Dashboard = () => {
               <p>10</p>
             </div>
 
-            <div className="dashboard-card">
-              <h3>Gerencia</h3>
-              <p>3</p>
-            </div>
-
-            <div className="dashboard-card">
-              <h3>Soporte</h3>
-              <p>3</p>
-            </div>
+            {Object.entries(usuariosPorSector).map(([nombreSector, cantidad]) => (
+              <div className="dashboard-card" key={nombreSector}>
+                <h3>{nombreSector}</h3>
+                <p>{cantidad}</p>
+              </div>
+            ))}
           </div>
 
         </>

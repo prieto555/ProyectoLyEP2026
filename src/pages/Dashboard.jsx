@@ -11,15 +11,26 @@ const Dashboard = () => {
   const usuariosPorSector = AutorizacionesService.contarUsuariosPorSector()
   const [totalClientes, setTotalClientes] = useState(0)
   const [cargando, setCargando] = useState(true)
+  const [error, setError] = useState(false)
 
   useEffect(() => {
     let vigente = true
 
     fetch(URL_CLIENTES)
-      .then((res) => res.json())
+      .then((res) => {
+        if (!res.ok) {
+          throw new Error('Error al obtener clientes')
+        }
+        return res.json()
+      })
       .then((data) => {
         if (!vigente) return
         setTotalClientes(Array.isArray(data) ? data.length : 0)
+        setCargando(false)
+      })
+      .catch(() => {
+        if (!vigente) return
+        setError(true)
         setCargando(false)
       })
 
@@ -52,7 +63,12 @@ const Dashboard = () => {
 
             <div className="dashboard-card" aria-busy={cargando}>
               <h3>Clientes</h3>
-              <p>{cargando ? '...' : totalClientes}</p>
+              <p>{cargando ? '...' : error ? '-' : totalClientes}</p>
+              {error && (
+                <span role="alert" className="dashboard-card-error">
+                  No se pudo obtener el total de clientes.
+                </span>
+              )}
             </div>
 
             {Object.entries(usuariosPorSector).map(([nombreSector, cantidad]) => (

@@ -14,6 +14,9 @@ const FormCliente = () => {
     const [error, setError] = useState("");
     const [loading, setLoading] = useState(false);
 
+    const campoInvalido = (valor) =>
+        Boolean(error) && valor.trim() === "";
+
     const manejarSubmit = async (e) => {
 
         e.preventDefault();
@@ -91,15 +94,24 @@ const FormCliente = () => {
 
             <h3>Nuevo Cliente</h3>
 
-            <Form onSubmit={manejarSubmit}>
+            <Form noValidate onSubmit={manejarSubmit} aria-busy={loading}>
 
                 <Form.Group className="mb-3">
 
-                    <Form.Label>Nombre</Form.Label>
+                    <Form.Label htmlFor="cliente-nombre">Nombre</Form.Label>
 
                     <Form.Control
+                        id="cliente-nombre"
                         type="text"
+                        required
                         value={nombre}
+                        aria-required="true"
+                        aria-invalid={campoInvalido(nombre)}
+                        aria-describedby={
+                            campoInvalido(nombre)
+                                ? "error-formulario-cliente"
+                                : undefined
+                        }
                         onChange={(e) =>
                             setNombre(e.target.value)
                         }
@@ -109,11 +121,20 @@ const FormCliente = () => {
 
                 <Form.Group className="mb-3">
 
-                    <Form.Label>Email</Form.Label>
+                    <Form.Label htmlFor="cliente-email">Email</Form.Label>
 
                     <Form.Control
+                        id="cliente-email"
                         type="email"
+                        required
                         value={email}
+                        aria-required="true"
+                        aria-invalid={campoInvalido(email)}
+                        aria-describedby={
+                            campoInvalido(email)
+                                ? "error-formulario-cliente"
+                                : undefined
+                        }
                         onChange={(e) =>
                             setEmail(e.target.value)
                         }
@@ -123,11 +144,20 @@ const FormCliente = () => {
 
                 <Form.Group className="mb-3">
 
-                    <Form.Label>Teléfono</Form.Label>
+                    <Form.Label htmlFor="cliente-telefono">Teléfono</Form.Label>
 
                     <Form.Control
+                        id="cliente-telefono"
                         type="text"
+                        required
                         value={telefono}
+                        aria-required="true"
+                        aria-invalid={campoInvalido(telefono)}
+                        aria-describedby={
+                            campoInvalido(telefono)
+                                ? "error-formulario-cliente"
+                                : undefined
+                        }
                         onChange={(e) =>
                             setTelefono(e.target.value)
                         }
@@ -137,11 +167,20 @@ const FormCliente = () => {
 
                 <Form.Group className="mb-3">
 
-                    <Form.Label>Ciudad</Form.Label>
+                    <Form.Label htmlFor="cliente-ciudad">Ciudad</Form.Label>
 
                     <Form.Control
+                        id="cliente-ciudad"
                         type="text"
+                        required
                         value={ciudad}
+                        aria-required="true"
+                        aria-invalid={campoInvalido(ciudad)}
+                        aria-describedby={
+                            campoInvalido(ciudad)
+                                ? "error-formulario-cliente"
+                                : undefined
+                        }
                         onChange={(e) =>
                             setCiudad(e.target.value)
                         }
@@ -157,7 +196,12 @@ const FormCliente = () => {
 
                     {
                         loading
-                            ? <Spinner size="sm" />
+                            ? <>
+                                <Spinner size="sm" aria-hidden="true" />
+                                <span className="visually-hidden">
+                                    Guardando cliente...
+                                </span>
+                              </>
                             : "Guardar Cliente"
                     }
 
@@ -168,6 +212,8 @@ const FormCliente = () => {
             {
                 mensaje &&
                 <Alert
+                    role="status"
+                    aria-live="polite"
                     className="mt-3"
                     variant="success"
                 >
@@ -178,6 +224,9 @@ const FormCliente = () => {
             {
                 error &&
                 <Alert
+                    id="error-formulario-cliente"
+                    role="alert"
+                    aria-live="assertive"
                     className="mt-3"
                     variant="danger"
                 >

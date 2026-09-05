@@ -1,11 +1,12 @@
 import '../css/detallecliente.css'
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
+import useAutorizaciones from "../hooks/useAutorizaciones";
  
 const DetalleCliente = () => {
  const { id } = useParams();
   const navigate = useNavigate();
-  const role = localStorage.getItem("role");
+  const { sector } = useAutorizaciones();
 
   const [cliente, setCliente] = useState(null);
   const [mensaje, setMensaje] = useState("");
@@ -16,7 +17,14 @@ const DetalleCliente = () => {
       .then((data) => setCliente(data));
   }, [id]);
 
+  const puedeEliminar = sector?.trim() === "Gerencia";
+
   const eliminarCliente = async () => {
+    if (!puedeEliminar) {
+      setMensaje("No tiene permisos para eliminar clientes");
+      return;
+    }
+
     try {
       const respuesta = await fetch(
         `https://fakestoreapi.com/users/${id}`,
@@ -43,7 +51,7 @@ const DetalleCliente = () => {
   return (
     <div className="detalle-cliente">
       <h1>Ficha del Cliente</h1>
-      <p>Rol actual: {role}</p>
+      <p>Rol actual: {sector}</p>
 
       {mensaje && <p className = 'mensaje-eliminado'>{mensaje}</p>}
 
@@ -92,7 +100,7 @@ const DetalleCliente = () => {
         <strong>Contraseña:</strong> {cliente.password}
       </p>
 
-      {role?.trim() === "Gerencia" && (
+      {puedeEliminar && (
         <button className='btn-eliminar'onClick={eliminarCliente}>
           Eliminar Cliente
         </button>

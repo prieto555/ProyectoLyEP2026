@@ -1,11 +1,30 @@
 import '../css/dashboard.css'
+import { useEffect, useState } from 'react'
 import useAutorizaciones from '../hooks/useAutorizaciones'
 import AutorizacionesService from '../services/autorizacionesServices'
 import Login from './Login'
 
+const URL_CLIENTES = 'https://fakestoreapi.com/users'
+
 const Dashboard = () => {
   const { admin } = useAutorizaciones()
   const usuariosPorSector = AutorizacionesService.contarUsuariosPorSector()
+  const [totalClientes, setTotalClientes] = useState(0)
+
+  useEffect(() => {
+    let vigente = true
+
+    fetch(URL_CLIENTES)
+      .then((res) => res.json())
+      .then((data) => {
+        if (!vigente) return
+        setTotalClientes(Array.isArray(data) ? data.length : 0)
+      })
+
+    return () => {
+      vigente = false
+    }
+  }, [])
 
   return (
     <div className="dashboard">
@@ -31,7 +50,7 @@ const Dashboard = () => {
 
             <div className="dashboard-card">
               <h3>Clientes</h3>
-              <p>10</p>
+              <p>{totalClientes}</p>
             </div>
 
             {Object.entries(usuariosPorSector).map(([nombreSector, cantidad]) => (

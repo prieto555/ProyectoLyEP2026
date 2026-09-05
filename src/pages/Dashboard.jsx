@@ -10,6 +10,7 @@ const Dashboard = () => {
   const { admin } = useAutorizaciones()
   const usuariosPorSector = AutorizacionesService.contarUsuariosPorSector()
   const [totalClientes, setTotalClientes] = useState(0)
+  const [cargando, setCargando] = useState(true)
 
   useEffect(() => {
     let vigente = true
@@ -19,6 +20,7 @@ const Dashboard = () => {
       .then((data) => {
         if (!vigente) return
         setTotalClientes(Array.isArray(data) ? data.length : 0)
+        setCargando(false)
       })
 
     return () => {
@@ -48,9 +50,9 @@ const Dashboard = () => {
           </div>
           <div className="dashboard-cards">
 
-            <div className="dashboard-card">
+            <div className="dashboard-card" aria-busy={cargando}>
               <h3>Clientes</h3>
-              <p>{totalClientes}</p>
+              <p>{cargando ? '...' : totalClientes}</p>
             </div>
 
             {Object.entries(usuariosPorSector).map(([nombreSector, cantidad]) => (

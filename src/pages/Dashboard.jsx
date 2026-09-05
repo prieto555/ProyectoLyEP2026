@@ -1,9 +1,43 @@
 import '../css/dashboard.css'
+import { useEffect, useState } from 'react'
 import useAutorizaciones from '../hooks/useAutorizaciones'
+import AutorizacionesService from '../services/autorizacionesServices'
 import Login from './Login'
+
+const URL_CLIENTES = 'https://fakestoreapi.com/users'
 
 const Dashboard = () => {
   const { admin } = useAutorizaciones()
+  const usuariosPorSector = AutorizacionesService.contarUsuariosPorSector()
+  const [totalClientes, setTotalClientes] = useState(0)
+  const [cargando, setCargando] = useState(true)
+  const [error, setError] = useState(false)
+
+  useEffect(() => {
+    let vigente = true
+
+    fetch(URL_CLIENTES)
+      .then((res) => {
+        if (!res.ok) {
+          throw new Error('Error al obtener clientes')
+        }
+        return res.json()
+      })
+      .then((data) => {
+        if (!vigente) return
+        setTotalClientes(Array.isArray(data) ? data.length : 0)
+        setCargando(false)
+      })
+      .catch(() => {
+        if (!vigente) return
+        setError(true)
+        setCargando(false)
+      })
+
+    return () => {
+      vigente = false
+    }
+  }, [])
 
   return (
     <div className="dashboard">
@@ -27,20 +61,22 @@ const Dashboard = () => {
           </div>
           <div className="dashboard-cards">
 
-            <div className="dashboard-card">
+            <div className="dashboard-card" aria-busy={cargando}>
               <h3>Clientes</h3>
-              <p>10</p>
+              <p>{cargando ? '...' : error ? '-' : totalClientes}</p>
+              {error && (
+                <span role="alert" className="dashboard-card-error">
+                  No se pudo obtener el total de clientes.
+                </span>
+              )}
             </div>
 
-            <div className="dashboard-card">
-              <h3>Gerencia</h3>
-              <p>3</p>
-            </div>
-
-            <div className="dashboard-card">
-              <h3>Soporte</h3>
-              <p>3</p>
-            </div>
+            {Object.entries(usuariosPorSector).map(([nombreSector, cantidad]) => (
+              <div className="dashboard-card" key={nombreSector}>
+                <h3>{nombreSector}</h3>
+                <p>{cantidad}</p>
+              </div>
+            ))}
           </div>
 
         </>

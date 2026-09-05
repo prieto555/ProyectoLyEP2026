@@ -44,6 +44,16 @@ const login = (email, password, sector) => {
       usuario.sector === sector
   )
 }
+const contarUsuariosPorSector = () => {
+  return usuarios.reduce(
+    (conteo, usuario) => ({
+      ...conteo,
+      [usuario.sector]: (conteo[usuario.sector] || 0) + 1
+    }),
+    {}
+  )
+}
 export default {
-  login
+  login,
+  contarUsuariosPorSector
 }

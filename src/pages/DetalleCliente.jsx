@@ -1,6 +1,7 @@
 import '../css/detallecliente.css'
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
+import clientesService from "../services/clientesService";
 import useAutorizaciones from "../hooks/useAutorizaciones";
  
 const DetalleCliente = () => {
@@ -10,11 +11,13 @@ const DetalleCliente = () => {
 
   const [cliente, setCliente] = useState(null);
   const [mensaje, setMensaje] = useState("");
+  const [error, setError] = useState(false);
 
   useEffect(() => {
-    fetch(`https://fakestoreapi.com/users/${id}`)
-      .then((res) => res.json())
-      .then((data) => setCliente(data));
+    clientesService
+      .obtenerClientePorId(id)
+      .then((data) => setCliente(data))
+      .catch(() => setError(true));
   }, [id]);
 
   const puedeEliminar = sector?.trim() === "Gerencia";
@@ -26,24 +29,21 @@ const DetalleCliente = () => {
     }
 
     try {
-      const respuesta = await fetch(
-        `https://fakestoreapi.com/users/${id}`,
-        {
-          method: "DELETE",
-        }
-      );
+      await clientesService.eliminarCliente(id);
+      setMensaje("Cliente eliminado correctamente");
 
-      if (respuesta.ok) {
-        setMensaje("Cliente eliminado correctamente");
-
-        setTimeout(() => {
-          navigate("/clientes");
-        }, 2000);
-      }
+      setTimeout(() => {
+        navigate("/clientes");
+      }, 2000);
     } catch (error) {
       setMensaje("Error al eliminar cliente");
     }
   };
+
+  if (error) {
+    return <h2>Error al cargar el detalle del cliente.</h2>;
+  }
+
   if (!cliente) {
     return <h2>Cargando cliente...</h2>;
   }

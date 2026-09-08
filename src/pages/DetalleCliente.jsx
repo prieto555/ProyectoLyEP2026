@@ -40,6 +40,21 @@ useEffect(() => {
   return () => window.removeEventListener("keydown", handleKeyDown);
 }, [mostrarModal]);
 
+// Refactorizar lógica de borrado y vincular la invocación previa
+const confirmarEliminacion = async () => {
+  setMostrarModal(false);
+  try {
+    await clientesService.eliminarCliente(id);
+    setMensaje("Cliente eliminado correctamente");
+
+    setTimeout(() => {
+      navigate("/clientes");
+    }, 2000);
+  } catch (error) {
+    setMensaje("Error al eliminar cliente");
+  }
+};
+
   if (error) {
     return <h2>Error al cargar el detalle del cliente.</h2>;
   }
@@ -99,6 +114,12 @@ useEffect(() => {
       <p>
         <strong>Contraseña:</strong> {cliente.password}
       </p>
+
+      {puedeEliminar && (
+  <button className="btn-eliminar" onClick={solicitarConfirmacion}>
+    Eliminar Cliente
+  </button>
+)}
 
     </div>
   );

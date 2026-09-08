@@ -1,17 +1,18 @@
-import '../css/detallecliente.css'
+import '../css/detallecliente.css';
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import clientesService from "../services/clientesService";
 import useAutorizaciones from "../hooks/useAutorizaciones";
- 
+
 const DetalleCliente = () => {
- const { id } = useParams();
+  const { id } = useParams();
   const navigate = useNavigate();
   const { sector } = useAutorizaciones();
 
   const [cliente, setCliente] = useState(null);
   const [mensaje, setMensaje] = useState("");
   const [error, setError] = useState(false);
+ const [mostrarModal, setMostrarModal] = useState(false);
 
   useEffect(() => {
     clientesService
@@ -20,25 +21,13 @@ const DetalleCliente = () => {
       .catch(() => setError(true));
   }, [id]);
 
-  const puedeEliminar = sector?.trim() === "Gerencia";
-
-  const eliminarCliente = async () => {
-    if (!puedeEliminar) {
-      setMensaje("No tiene permisos para eliminar clientes");
-      return;
-    }
-
-    try {
-      await clientesService.eliminarCliente(id);
-      setMensaje("Cliente eliminado correctamente");
-
-      setTimeout(() => {
-        navigate("/clientes");
-      }, 2000);
-    } catch (error) {
-      setMensaje("Error al eliminar cliente");
-    }
-  };
+  const solicitarConfirmacion = () => {
+  if (!puedeEliminar) {
+    setMensaje("No tiene permisos para eliminar clientes");
+    return;
+  }
+  setMostrarModal(true);
+};
 
   if (error) {
     return <h2>Error al cargar el detalle del cliente.</h2>;
@@ -53,7 +42,7 @@ const DetalleCliente = () => {
       <h1>Ficha del Cliente</h1>
       <p>Rol actual: {sector}</p>
 
-      {mensaje && <p className = 'mensaje-eliminado'>{mensaje}</p>}
+      {mensaje && <p className="mensaje-eliminado">{mensaje}</p>}
 
       <p>
         <strong>ID:</strong> {cliente.id}
@@ -100,11 +89,6 @@ const DetalleCliente = () => {
         <strong>Contraseña:</strong> {cliente.password}
       </p>
 
-      {puedeEliminar && (
-        <button className='btn-eliminar'onClick={eliminarCliente}>
-          Eliminar Cliente
-        </button>
-      )}
     </div>
   );
 };

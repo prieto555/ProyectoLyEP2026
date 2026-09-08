@@ -121,6 +121,38 @@ const confirmarEliminacion = async () => {
   </button>
 )}
 
+{mostrarModal && (
+  <div 
+    className="modal-overlay" 
+    role="dialog" 
+    aria-modal="true" 
+    aria-labelledby="modal-titulo"
+  >
+    <div className="modal-contenido">
+      <h3 id="modal-titulo">Confirmar eliminación</h3>
+      <p>
+        ¿Está seguro de que desea eliminar al cliente{" "}
+        <strong>{cliente.name.firstname} {cliente.name.lastname}</strong>? Esta acción no se puede deshacer.
+      </p>
+      <div className="modal-acciones">
+        <button 
+          className="btn-cancelar" 
+          onClick={() => setMostrarModal(false)}
+        >
+          Cancelar
+        </button>
+        <button 
+          className="btn-confirmar-eliminar" 
+          onClick={confirmarEliminacion}
+          autoFocus
+        >
+          Confirmar
+        </button>
+      </div>
+    </div>
+  </div>
+)}
+
     </div>
   );
 };

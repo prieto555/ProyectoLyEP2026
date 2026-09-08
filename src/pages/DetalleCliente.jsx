@@ -29,6 +29,17 @@ const DetalleCliente = () => {
   setMostrarModal(true);
 };
 
+// Agregar efecto para capturar la tecla Escape cuando el modal está abierto
+useEffect(() => {
+  const handleKeyDown = (e) => {
+    if (e.key === "Escape" && mostrarModal) {
+      setMostrarModal(false);
+    }
+  };
+  window.addEventListener("keydown", handleKeyDown);
+  return () => window.removeEventListener("keydown", handleKeyDown);
+}, [mostrarModal]);
+
   if (error) {
     return <h2>Error al cargar el detalle del cliente.</h2>;
   }

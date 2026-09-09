@@ -11,51 +11,52 @@ const DetalleCliente = () => {
 
   const [cliente, setCliente] = useState(null);
   const [mensaje, setMensaje] = useState("");
-  const [error, setError] = useState(false);
- const [mostrarModal, setMostrarModal] = useState(false);
+  const [errorCarga, setErrorCarga] = useState(false);
+  const [mostrarModal, setMostrarModal] = useState(false);
+
+  // Declaración necesaria para los permisos de borrado
+  const puedeEliminar = sector?.trim() === "Gerencia";
 
   useEffect(() => {
     clientesService
       .obtenerClientePorId(id)
       .then((data) => setCliente(data))
-      .catch(() => setError(true));
+      .catch(() => setErrorCarga(true));
   }, [id]);
 
-  const solicitarConfirmacion = () => {
-  if (!puedeEliminar) {
-    setMensaje("No tiene permisos para eliminar clientes");
-    return;
-  }
-  setMostrarModal(true);
-};
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === "Escape" && mostrarModal) {
+        setMostrarModal(false);
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [mostrarModal]);
 
-// Agregar efecto para capturar la tecla Escape cuando el modal está abierto
-useEffect(() => {
-  const handleKeyDown = (e) => {
-    if (e.key === "Escape" && mostrarModal) {
-      setMostrarModal(false);
+  const solicitarConfirmacion = () => {
+    if (!puedeEliminar) {
+      setMensaje("No tiene permisos para eliminar clientes");
+      return;
+    }
+    setMostrarModal(true);
+  };
+
+  const confirmarEliminacion = async () => {
+    setMostrarModal(false);
+    try {
+      await clientesService.eliminarCliente(id);
+      setMensaje("Cliente eliminado correctamente");
+
+      setTimeout(() => {
+        navigate("/clientes");
+      }, 2000);
+    } catch {
+      setMensaje("Error al eliminar cliente");
     }
   };
-  window.addEventListener("keydown", handleKeyDown);
-  return () => window.removeEventListener("keydown", handleKeyDown);
-}, [mostrarModal]);
 
-// Refactorizar lógica de borrado y vincular la invocación previa
-const confirmarEliminacion = async () => {
-  setMostrarModal(false);
-  try {
-    await clientesService.eliminarCliente(id);
-    setMensaje("Cliente eliminado correctamente");
-
-    setTimeout(() => {
-      navigate("/clientes");
-    }, 2000);
-  } catch (error) {
-    setMensaje("Error al eliminar cliente");
-  }
-};
-
-  if (error) {
+  if (errorCarga) {
     return <h2>Error al cargar el detalle del cliente.</h2>;
   }
 
@@ -116,43 +117,42 @@ const confirmarEliminacion = async () => {
       </p>
 
       {puedeEliminar && (
-  <button className="btn-eliminar" onClick={solicitarConfirmacion}>
-    Eliminar Cliente
-  </button>
-)}
-
-{mostrarModal && (
-  <div 
-    className="modal-overlay" 
-    role="dialog" 
-    aria-modal="true" 
-    aria-labelledby="modal-titulo"
-  >
-    <div className="modal-contenido">
-      <h3 id="modal-titulo">Confirmar eliminación</h3>
-      <p>
-        ¿Está seguro de que desea eliminar al cliente{" "}
-        <strong>{cliente.name.firstname} {cliente.name.lastname}</strong>? Esta acción no se puede deshacer.
-      </p>
-      <div className="modal-acciones">
-        <button 
-          className="btn-cancelar" 
-          onClick={() => setMostrarModal(false)}
-        >
-          Cancelar
+        <button className="btn-eliminar" onClick={solicitarConfirmacion}>
+          Eliminar Cliente
         </button>
-        <button 
-          className="btn-confirmar-eliminar" 
-          onClick={confirmarEliminacion}
-          autoFocus
-        >
-          Confirmar
-        </button>
-      </div>
-    </div>
-  </div>
-)}
+      )}
 
+      {mostrarModal && (
+        <div 
+          className="modal-overlay" 
+          role="dialog" 
+          aria-modal="true" 
+          aria-labelledby="modal-titulo"
+        >
+          <div className="modal-contenido">
+            <h3 id="modal-titulo">Confirmar eliminación</h3>
+            <p>
+              ¿Está seguro de que desea eliminar al cliente{" "}
+              <strong>{cliente.name.firstname} {cliente.name.lastname}</strong>? Esta acción no se puede deshacer.
+            </p>
+            <div className="modal-acciones">
+              <button 
+                className="btn-cancelar" 
+                onClick={() => setMostrarModal(false)}
+              >
+                Cancelar
+              </button>
+              <button 
+                className="btn-confirmar-eliminar" 
+                onClick={confirmarEliminacion}
+                autoFocus
+              >
+                Confirmar
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
